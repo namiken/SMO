@@ -1,6 +1,7 @@
 package 研究室.svm.変数取得;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import 研究室.svm.SmoConstant;
@@ -42,9 +43,13 @@ public class SecondRandomFromNotBeBoundary extends VariableSelector{
 	}
 
 	public int getFirstIndex(double[] alphas) {
+		if (allUpdated()) {
+			Arrays.fill(updateAlphaFlgs, false);
+		}
+		
 		//上限に達していないサポートベクトルに対してKKT条件の違反チェックを行う
 		for (int i = 0; i < tData.size(); i++) {
-			//一度更新したものならスキップする
+//			//一度更新したものならスキップする
 			if (updateAlphaFlgs[i]) {
 				continue;
 			}
@@ -79,5 +84,14 @@ public class SecondRandomFromNotBeBoundary extends VariableSelector{
 		}
 		
 		return -1;
+	}
+
+	private boolean allUpdated() {
+		for (boolean flg : updateAlphaFlgs) {
+			if (!flg) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

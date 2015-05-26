@@ -1,6 +1,5 @@
 package 研究室.svm;
 
-import util.ArrayCalcUtil;
 
 public abstract class VariableSelector {
 	public VariableSelector(SmoConstant smoConstant) {
@@ -25,7 +24,7 @@ public abstract class VariableSelector {
 	
 	public void setUpdateFlg(int firstIndex, int secondIndex) {
 		updateAlphaFlgs[firstIndex] = true;
-		updateAlphaFlgs[secondIndex] = true;
+//		updateAlphaFlgs[secondIndex] = true;
 	}
 	
 	/**
@@ -56,17 +55,16 @@ public abstract class VariableSelector {
 	 * @return
 	 */
 	protected double getBiasTerm(double[] alphas) {
-		double[][] x = tData.getX();
 		int[] y = tData.getY();
 		
 		double sum = 0;
 		
 		int count = 0;
-		for (int i = 0; i < alphas.length; i++) {
+		for (int j = 0; j < alphas.length; j++) {
 			//上限に達しているサポートベクトルを選択
-			if (0 < alphas[i] && alphas[i] < c) {
+			if (0 < alphas[j] && alphas[j] < c) {
 				count ++;
-				sum += (y[i] - ArrayCalcUtil.innerProduct(getW(alphas), x[i]));
+				sum += (y[j] - getCalc(alphas, j));
 			}
 		}
 		
@@ -76,16 +74,16 @@ public abstract class VariableSelector {
 			return 0;
 		}
 	}
-
 	
-	private double[] getW(double[] alphas) {
+	protected double getCalc(double[] alphas, int j) {
 		double[][] x = tData.getX();
 		int[] y = tData.getY();
 		
-		double sum[] = new double[x[0].length];
-		for (int i = 0; i < x.length ; i++) {
-			sum = ArrayCalcUtil.addition(sum, ArrayCalcUtil.scalarMultiple(alphas[i] * y[i], x[i]));
+		double sum = 0;
+		for (int i = 0; i < alphas.length; i++) {
+			sum += alphas[i] * y[i] * kernel.getValue(x[i], x[j]);
 		}
+		
 		return sum;
 	}
 }

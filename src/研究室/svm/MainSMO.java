@@ -24,11 +24,14 @@ public class MainSMO {
 
 		//変数選択クラス
 		VariableSelector selector = new SecondRandomFromNotBeBoundary(smoConstant);
+//		VariableSelector selector = new TestOneDementionSelector(smoConstant);
 		
 
-		MainSMO main = new MainSMO(smoTest, selector);
-		main.excute();
-		print("b=:" + selector.getBiasTerm(main.alphas));
+		MainSMO main = new MainSMO(smoTest, selector, smoConstant);
+		main.updateAllAlpha();
+		
+		logDebug(smoConstant.kernel.getKernelCalcLog());
+		print("b = " + selector.getBiasTerm(main.alphas));
 	}
 	
 	double[] alphas;
@@ -37,19 +40,18 @@ public class MainSMO {
 	
 	VariableSelector vSector;
 	
-	public MainSMO(UpdateAlpha smoTest, VariableSelector selector) {
+	SmoConstant constant;
+	
+	public MainSMO(UpdateAlpha smoTest, VariableSelector selector, SmoConstant smoConstant) {
 		this.smo = smoTest;
 		alphas = new double[selector.tData.size()];
 		this.vSector = selector;
 		
+		constant = smoConstant;
 	}
 
-	public void excute() {
-		int count = 0;
-		
+	public void updateAllAlpha() {
 		while (true) {
-			count++;
-			
 			int k_index = vSector.getFirstIndex(alphas); //第一変数
 			if (k_index == -1) {
 				break;
@@ -61,16 +63,12 @@ public class MainSMO {
 				l_index = vSector.getSecondIndex(alphas, k_index); // 第二変数
 			}
 			
-			logDebug("selected:first" + k_index + ", secound:" + l_index);
+			logDebug("\n selected:first" + k_index + ", secound:" + l_index);
 			alphas = smo.getUpdateTwoAlphas(k_index, l_index, alphas);
 
 			//更新済みフラグをつける
 			vSector.setUpdateFlg(k_index, l_index);
 			
-			//TODO 変数化
-			if (smo.y.length + 1 < count) {
-				throw new RuntimeException("over loop");
-			}
 		}
 		
 		print(Arrays.toString(smo.alphas));

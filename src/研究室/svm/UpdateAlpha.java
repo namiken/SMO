@@ -37,7 +37,13 @@ public class UpdateAlpha {
 	 * @return
 	 */
 	private double gamma(int l_index, int k_index) {
-		return y[k_index] * alphas[k_index] + y[l_index] * alphas[l_index];
+		double sum = 0;
+		for (int i = 0; i < alphas.length; i++) {
+			if (l_index != i && k_index != i) {
+				sum -= y[i] * alphas[i];
+			}
+		}
+		return sum;
 	}
 	
 	/**
@@ -71,6 +77,7 @@ public class UpdateAlpha {
 		//4項目
 		sum += -1.0 * alphas[l_index] * y[l_index] * eta(xk, xl);
 		
+		LoggerSMO.logDebug("F_l - F_k: " + sum);
 		return sum;
 	}
 	
@@ -82,6 +89,8 @@ public class UpdateAlpha {
 	public double[] getUpdateTwoAlphas(int l_index, int k_index, double[] alphas) {
 		this.alphas = alphas;
 		
+		LoggerSMO.logDebug("η:" + eta(x[l_index], x[k_index]));
+		LoggerSMO.logDebug("γ:" + gamma(l_index, k_index));
 		if (eta(x[l_index], x[k_index]) != 0) {
 			updateTwoAlphasIfEtaNotZero(l_index, k_index);
 		} else {
@@ -90,7 +99,7 @@ public class UpdateAlpha {
 		
 		return this.alphas;
 	}
-
+	
 	/**
 	 * ηが0のとき、αを更新する
 	 * @param l_index
@@ -135,7 +144,10 @@ public class UpdateAlpha {
 		double[] xl = x[l_index];
 		double[] xk = x[k_index];
 		
+		double gamma = gamma(l_index, k_index);
+		
 		double l_newAlpha = y[l_index] * oldFSubtraction(l_index, k_index) / eta(xk, xl) + alphas[l_index];
+		
 		
 		//0 <= α_l <= cを満たすように 
 		if (l_newAlpha < 0.0) {
@@ -144,26 +156,42 @@ public class UpdateAlpha {
 			l_newAlpha = c;
 		}
 		
+		double k_newAlpha_temp = -1.0 * y[k_index] * y[l_index] * l_newAlpha + y[k_index] * gamma;
+		if (k_newAlpha_temp > c || k_newAlpha_temp < 0) {
+			System.out.println();
+		}
+		double l_oldAlpha = l_newAlpha;
+		
 		//0 <= α_k <= cを満たすようなα_lを作成する
 		if (y[l_index] * y[k_index] == 1) {
-			if (l_newAlpha < y[l_index] * gamma(l_index, k_index) - c) {
-				l_newAlpha = y[l_index] * gamma(l_index, k_index) - c;
-			} else if (l_newAlpha > y[l_index] * gamma(l_index, k_index)) {
-				l_newAlpha = y[l_index] * gamma(l_index, k_index);
+			if (l_newAlpha < y[k_index] * gamma - c) {
+				l_newAlpha = y[k_index] * gamma - c;
+			} else if (l_newAlpha > y[k_index] * gamma) {
+				l_newAlpha = y[k_index] * gamma;
 			}
 		} else {
-			if (l_newAlpha > y[l_index] * gamma(l_index, k_index) + c) {
-				l_newAlpha = y[l_index] * gamma(l_index, k_index) + c;
-			} else if (l_newAlpha < y[l_index] * gamma(l_index, k_index)) {
-				l_newAlpha = y[l_index] * gamma(l_index, k_index);
+			if (l_newAlpha > -y[k_index] * gamma + c) {
+				l_newAlpha = -y[k_index] * gamma + c;
+			} else if (l_newAlpha < -y[k_index] * gamma) {
+				l_newAlpha = -y[k_index] * gamma;
 			}
+		}
+		
+		if (l_newAlpha != l_oldAlpha) {
+			System.out.println("神回避");
+		}
+		
+		if (l_newAlpha > c || l_newAlpha < 0) {
+			System.out.println("マイナス");
 		}
 		
 		//α_lを更新
 		alphas[l_index] = l_newAlpha;
+		LoggerSMO.logDebug("new α_first(l):" + l_newAlpha);
 		
 		//α_kを作成する
-		double k_newAlpha = -1.0 * y[k_index] * y[l_index] * alphas[l_index] + y[k_index] * gamma(l_index, k_index);
+		double k_newAlpha = -1.0 * y[k_index] * y[l_index] * alphas[l_index] + y[k_index] * gamma;
+		LoggerSMO.logDebug("new α_second(k):" + k_newAlpha);
 		
 		//α_kを更新
 		alphas[k_index] = k_newAlpha;
