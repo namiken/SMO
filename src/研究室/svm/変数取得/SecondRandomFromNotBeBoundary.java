@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
+import 研究室.svm.DecisionFunctions;
 import 研究室.svm.SmoConstant;
 import 研究室.svm.VariableSelector;
 
@@ -43,6 +44,8 @@ public class SecondRandomFromNotBeBoundary extends VariableSelector{
 	}
 
 	public int getFirstIndex(double[] alphas) {
+		DecisionFunctions dFunction = new DecisionFunctions(constantData, alphas);
+		
 		if (allUpdated()) {
 			Arrays.fill(updateAlphaFlgs, false);
 		}
@@ -54,7 +57,7 @@ public class SecondRandomFromNotBeBoundary extends VariableSelector{
 				continue;
 			}
 			if (0 < alphas[i] && alphas[i] < c) {
-				if (tData.getY()[i] * getDecisionDunction(tData.getX()[i], alphas) != 1) {
+				if (tData.getY()[i] * dFunction.getDecisionDunction(tData.getX()[i]) != 1) {
 					return i;
 				}
 			}
@@ -70,11 +73,11 @@ public class SecondRandomFromNotBeBoundary extends VariableSelector{
 				//何もしない
 				continue;
 			} else if (alphas[i] == 0) {
-				if (tData.getY()[i] * getDecisionDunction(tData.getX()[i], alphas) < 1) {
+				if (tData.getY()[i] * dFunction.getDecisionDunction(tData.getX()[i]) < 1) {
 					return i;
 				}
 			} else if (alphas[i] == c) {
-				if (tData.getY()[i] * getDecisionDunction(tData.getX()[i], alphas) > 1) {
+				if (tData.getY()[i] * dFunction.getDecisionDunction(tData.getX()[i]) > 1) {
 					return i;
 				}
 			} else {

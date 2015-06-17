@@ -55,4 +55,8 @@ public abstract class Kernel {
 			return sb.toString();
 		}
 	}
+	
+	public String getMathematicaString(double[] x1) {
+		throw new RuntimeException("need to Override");
+	}
 }

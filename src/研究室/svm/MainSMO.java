@@ -3,35 +3,48 @@ package 研究室.svm;
 import static 研究室.svm.LoggerSMO.logDebug;
 import static 研究室.svm.LoggerSMO.print;
 
+import java.io.IOException;
 import java.util.Arrays;
 
+import 研究室.svm.kernel.LinearKernel;
 import 研究室.svm.kernel.PolynomialKernel;
 import 研究室.svm.変数取得.SecondRandomFromNotBeBoundary;
-import 研究室.svm.教師データ.OneDimensionalData;
+import 研究室.svm.教師データ.TwoDementionData;
 
 public class MainSMO {
 	
-	public static void main(String[] args) {
-		OneDimensionalData oneDimensionalData = new OneDimensionalData();
+	public static void main(String[] args) throws IOException {
+		TeacherDataGenerator dataGenerator = new TwoDementionData();
+//				new ImageTeacherData(9, 
+//				new File("C:\\Users\\kensuke\\Desktop\\研究室\\1"),
+//				new File("C:\\Users\\kensuke\\Desktop\\研究室\\2"));
+		
 		//教師データ
-		TeacherData teacherData = oneDimensionalData.getTeacherData();
+		TeacherData teacherData = dataGenerator.getTeacherData();
+		
+		teacherData.printLog();
 		
 		double c = 2.0;
 		
-		SmoConstant smoConstant = new SmoConstant(teacherData, new PolynomialKernel(2), c);
-
-		UpdateAlpha smoTest = new UpdateAlpha(smoConstant);
+		SmoConstant smoConstant = new SmoConstant(teacherData, new LinearKernel(), c);
 
 		//変数選択クラス
 		VariableSelector selector = new SecondRandomFromNotBeBoundary(smoConstant);
-//		VariableSelector selector = new TestOneDementionSelector(smoConstant);
 		
-
-		MainSMO main = new MainSMO(smoTest, selector, smoConstant);
+		MainSMO main = new MainSMO(selector, smoConstant);
 		main.updateAllAlpha();
 		
 		logDebug(smoConstant.kernel.getKernelCalcLog());
-		print("b = " + selector.getBiasTerm(main.alphas));
+		
+		DecisionFunctions functions = new DecisionFunctions(smoConstant, main.alphas);
+		
+		print("b = " + functions.getBiasTerm());
+		
+//		double checkUnknownData = functions.checkUnknownData(new ScanImage(9).readOneImage(new File("C:\\Users\\kensuke\\Desktop\\研究室\\test\\test.jpg")));
+//		print(checkUnknownData > 0 ? "未知データは：１" : "未知データは：２");
+		
+		logDebug(functions.getMathmaticaStringt());
+		
 	}
 	
 	double[] alphas;
@@ -42,8 +55,8 @@ public class MainSMO {
 	
 	SmoConstant constant;
 	
-	public MainSMO(UpdateAlpha smoTest, VariableSelector selector, SmoConstant smoConstant) {
-		this.smo = smoTest;
+	public MainSMO(VariableSelector selector, SmoConstant smoConstant) {
+		this.smo = new UpdateAlpha(smoConstant);;
 		alphas = new double[selector.tData.size()];
 		this.vSector = selector;
 		

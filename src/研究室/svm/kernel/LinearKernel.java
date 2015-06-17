@@ -4,17 +4,14 @@ import util.ArrayCalcUtil;
 import 研究室.svm.Kernel;
 
 
-public class PolynomialKernel extends Kernel {
-	int d;
+public class LinearKernel extends Kernel {
 	
-	public PolynomialKernel(int d) {
-		this.d = d;
+	public LinearKernel() {
 	}
 	
 	@Override
 	protected double getValueOverride(double[] x1, double[] x2) {
-		double temp = ArrayCalcUtil.innerProduct(x1, x2) + 1.0;
-		return Math.pow(temp, d);
+		return ArrayCalcUtil.innerProduct(x1, x2);
 	}
 	
 	@Override
@@ -23,11 +20,8 @@ public class PolynomialKernel extends Kernel {
 		
 		sb.append("(");
 		for (int i = 0; i < teacherData.length; i++) {
-			sb.append("(");
 			sb.append("x" + (i + 1));
 			sb.append(" * " + teacherData[i]);
-			sb.append(")^");
-			sb.append(d);
 			
 			if (i != teacherData.length - 1) {
 				sb.append(" + ");
