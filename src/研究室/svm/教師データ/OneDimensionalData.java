@@ -57,4 +57,5 @@ public class OneDimensionalData implements TeacherDataGenerator{
 			return xList.size();
 		}
 	}
+
 }

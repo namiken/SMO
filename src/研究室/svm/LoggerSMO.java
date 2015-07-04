@@ -2,11 +2,15 @@ package 研究室.svm;
 
 public class LoggerSMO {
 	public static void logDebug(String str) {
-		System.out.println(str);
+		if (printLogFlg) {
+			System.out.println(str);
+		}
 	}
 
 	public static void logDebug(String format, Object ... args) {
-		System.out.printf(format + "\n", args);
+		if (printLogFlg) {
+			System.out.printf(format + "\n", args);
+		}
 	}
 	
 	public static void print(String str) {
@@ -14,8 +18,10 @@ public class LoggerSMO {
 	}
 
 	public static void logNormal(String str) {
-		System.out.println(str);
+		if (printLogFlg) {
+			System.out.println(str);
+		}
 	}
 	
-	public final static boolean printLogFlg = true; 
+	public final static boolean printLogFlg = false; 
 }

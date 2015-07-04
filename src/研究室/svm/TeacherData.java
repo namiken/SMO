@@ -24,6 +24,16 @@ public class TeacherData implements Serializable{
 		assertSize();
 		return x;
 	}
+
+	public int getY(int i) {
+		assertSize();
+		return y[i];
+	}
+	
+	public double[] getX(int i) {
+		assertSize();
+		return x[i];
+	}
 	
 	public int size() {
 		assertSize();

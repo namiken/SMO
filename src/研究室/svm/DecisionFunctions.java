@@ -25,6 +25,20 @@ public class DecisionFunctions {
 		return getDecisionDunction(unKnownX);
 	}
 	
+	public int getKronecerUnknownData(double[] unknownX) {
+		double value = checkUnknownData(unknownX);
+		
+		if (value < 0) {
+			return -1;
+		} else if (value > 0) {
+			return 1;
+		} else {
+			return 0;
+		}
+		
+	}
+	
+	
 	/**
 	 * 決定関数を取得する
 	 * @param unKnownX

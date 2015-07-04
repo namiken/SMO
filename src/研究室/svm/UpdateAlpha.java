@@ -178,11 +178,11 @@ public class UpdateAlpha {
 		}
 		
 		if (l_newAlpha != l_oldAlpha) {
-			System.out.println("神回避");
+			LoggerSMO.logDebug("神回避");
 		}
 		
 		if (l_newAlpha > c || l_newAlpha < 0) {
-			System.out.println("マイナス");
+			LoggerSMO.logDebug("マイナス");
 		}
 		
 		//α_lを更新

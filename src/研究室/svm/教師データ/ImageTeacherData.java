@@ -56,5 +56,4 @@ public class ImageTeacherData implements TeacherDataGenerator {
 		}
 		return teacherData;
 	}
-
 }
